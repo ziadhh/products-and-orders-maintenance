@@ -30,7 +30,7 @@ public class ProductService {
     }
 
     @Transactional
-    public Product updateProduct(Product product) {
+   public Product updateProduct(Product product) {
         log.debug("Product will be updated");
         productRepository.updateById(product.getProductId(),product.getName(),product.getQuantityInStock(),product.getPricePerUnit());
         log.debug("Product updated");
