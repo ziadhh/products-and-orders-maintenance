@@ -30,7 +30,7 @@ The data model would be as follows
 - status_order table
 
 #### Products
-| PRODUCT_ID | NAME | STOCK | PRICE_PER_UNIT | 
+| PRODUCT_ID | NAME | QUANTITY_IN_STOCK | PRICE_PER_UNIT | 
 | ------------- | ------------- | ------------- | ------------- | 
 | 1  | bread  | 100  | 1 |
 | 2  | water |  200 | 0.5 |
@@ -45,12 +45,16 @@ The data model would be as follows
 | 2  | 3  |  100 | 75 |
 | 2  | 4  | 120  | 120 |
 
-#### OrderStatus
+#### OrderStatus 
 
-| ORDER_ID | STATUS |
-| ------------- | ------------- |
-| 1  | CREATED  |
-| 2  | PAID  |
-| 3  | CANCELLED  |
-| 4  | INVALID  |
+| ORDER_ID | STATUS | AUDIT_DATE |
+| ------------- | ------------- |  ------------- |
+| 1  | CREATED  | 20-09-2022 10:03
+| 2  | PAID  | 20-09-2022 12:03
+| 3  | CANCELLED  | 21-09-2022 11:03
+| 4  | INVALID  | 20-09-2022 10:33
+
+Asumption:
+
+The invalid state is done after 30 min after the created status if no action have been done before.
 
