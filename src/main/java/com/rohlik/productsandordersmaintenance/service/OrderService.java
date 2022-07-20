@@ -25,7 +25,7 @@ public class OrderService {
     @Autowired
     private ProductRepository productRepository;
 
-    public Order saveOrder(Order order) {
+    public Order saveOrder(Order order) throws Exception{
         log.debug("Order will be saved");
         order= orderRepository.save(order);
         int productId=order.getId().getProductId();
@@ -33,6 +33,11 @@ public class OrderService {
         Integer quantityInStock=product.getQuantityInStock();
         Integer updatedQuantityInStock=quantityInStock-order.getQuantity();
         product.setQuantityInStock(updatedQuantityInStock);
+        if (updatedQuantityInStock<0){
+            log.warn("The order can't be done, the are "+ Math.abs(updatedQuantityInStock) +" items for product with id "+ productId+" missing");
+            //int a=20/0;
+            throw new RuntimeException("Missing Items"); // si pongo exception la transacionalidad no va..
+        }
         productRepository.save(product);
         log.debug("order saved");
         return order;
@@ -55,7 +60,7 @@ public class OrderService {
             Integer updatedQuantityInStock = quantityInStock - order.getQuantity();
             if (updatedQuantityInStock<0){
                 log.warn("The order can't be done, the are "+ Math.abs(updatedQuantityInStock) +" items for product with id "+ productId+" missing");
-                throw new Exception("Missing Items");
+                throw new RuntimeException("Missing Items");
             }
             product.setQuantityInStock(updatedQuantityInStock);
             productRepository.save(product);
