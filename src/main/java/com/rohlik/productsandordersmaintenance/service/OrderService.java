@@ -75,7 +75,7 @@ public class OrderService {
         if (missingProducts.size()>0){
             orderDTO.setOrderId(orderRequest.getOrderId());
             orderDTO.setProducts(missingProducts);
-            orderDTO.setStatus("MISSING PRODUCTS");
+            orderDTO.setStatus(OrderConstants.Status.CREATED_PARTIALLY.name());
         }else{
             orderDTO.setOrderId(orderRequest.getOrderId());
             orderDTO.setProducts(productsInOrder);
