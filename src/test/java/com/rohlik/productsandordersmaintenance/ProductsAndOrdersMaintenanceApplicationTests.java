@@ -6,6 +6,7 @@ import com.rohlik.productsandordersmaintenance.dto.OrderDTO;
 import com.rohlik.productsandordersmaintenance.dto.OrderRequest;
 import com.rohlik.productsandordersmaintenance.dto.ProductDTO;
 import com.rohlik.productsandordersmaintenance.dto.ProductRequest;
+import com.rohlik.productsandordersmaintenance.entity.OrderStatus;
 import com.rohlik.productsandordersmaintenance.entity.Product;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -136,8 +137,25 @@ class ProductsAndOrdersMaintenanceApplicationTests {
 		OrderDTO resultOrder = restTemplate.postForObject(uriOrder,orderRequestWrong, OrderDTO.class);
 		assertEquals(resultOrder.getStatus(), OrderConstants.Status.CREATED_PARTIALLY.name());
 
-
 	}
+
+
+	@Test
+	void payOrderTest() {
+		addOrderWithoutMissedProductsTest();
+		String uriOrder = "http://localhost:" + port + "/maintenance/payOrder/"+orderRequest.getOrderId();
+		OrderStatus resultOrder = restTemplate.postForObject(uriOrder,orderRequest, OrderStatus.class);
+		assertEquals(resultOrder.getStatus(), OrderConstants.Status.PAID.name());
+	}
+
+	@Test
+	void cancelOrderTest() {
+		addOrderWithoutMissedProductsTest();
+		String uriOrder = "http://localhost:" + port + "/maintenance/cancelOrder/"+orderRequest.getOrderId();
+		OrderStatus resultOrder = restTemplate.postForObject(uriOrder,orderRequest, OrderStatus.class);
+		assertEquals(resultOrder.getStatus(), OrderConstants.Status.CANCELLED.name());
+	}
+
 
 	private void evaluateProducts(Product expected,Product result ){
 		assertEquals(expected,result);
