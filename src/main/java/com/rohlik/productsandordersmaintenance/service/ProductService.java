@@ -1,10 +1,12 @@
 package com.rohlik.productsandordersmaintenance.service;
 
 
+import com.rohlik.productsandordersmaintenance.constants.ProductConstants;
 import com.rohlik.productsandordersmaintenance.entity.Product;
 import com.rohlik.productsandordersmaintenance.repository.ProductRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,11 +30,18 @@ public class ProductService {
         return product;
     }
 
-    public Product deleteProduct(Product product) {
+    public String deleteProduct(Product product) throws EmptyResultDataAccessException {
         log.debug("Product will be deleted");
-        product=productRepository.deleteById(product.getProductId());
+        String message;
+        try {
+            productRepository.deleteById(product.getProductId());
+            message= ProductConstants.msgProductDeleted;
+        }catch(Exception ex){
+            message=ProductConstants.msgProductNotDeleted;
+            log.error("Product has not been deleted");
+        }
         log.debug("Product deleted");
-        return product;
+        return message;
     }
 
     @Transactional

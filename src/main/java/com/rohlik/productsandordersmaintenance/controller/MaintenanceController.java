@@ -57,15 +57,15 @@ public class MaintenanceController {
         return    new ResponseEntity(productService.saveProduct(product),  HttpStatus.OK);
     }
 
-    @DeleteMapping("/deleteProduct")
-    public ResponseEntity<Product> deleteProduct(@RequestBody ProductRequest productRequest){
+    @PostMapping("/deleteProduct")
+    public ResponseEntity<String> deleteProduct(@RequestBody ProductRequest productRequest){
 
         Product product=productMapper.requestToEntity(productRequest);
         log.info("Deleting new product..");
         return    new ResponseEntity(productService.deleteProduct(product),  HttpStatus.OK);
     }
 
-    @PutMapping("/updateProduct")
+    @PostMapping("/updateProduct")
     public ResponseEntity<Product> updateProduct(@RequestBody ProductRequest productRequest){
 
         Product product=productMapper.requestToEntity(productRequest);
