@@ -45,46 +45,46 @@ public class OrderService {
 
         List<ProductDTO> productsInOrder = orderRequest.getProducts();
         List<ProductDTO> missingProducts= new ArrayList<>();
-        OrderDTO orderDTO= new OrderDTO();
+        List<ProductDTO> availabeProducts= new ArrayList<>();
         log.info("Order will be saved");
-        OrderStatus orderStatus=new OrderStatus();
-        orderStatus.setOrderId(orderRequest.getOrderId());
-        orderStatus.setStatus(OrderConstants.Status.CREATED.name());
-        orderStatus.setLastUpdate(LocalDateTime.now());
         for (ProductDTO prod : productsInOrder) {
-            Order order = new Order();
             OrderId orderId = new OrderId(orderRequest.getOrderId(), prod.getProductId());
-            order.setId(orderId);
-            order.setQuantity(prod.getQuantity());
+            Order order = Order.builder().id(orderId).quantity(prod.getQuantity()).build();
             int productId = order.getId().getProductId();
             Product product = productRepository.findById(productId);
             Integer quantityInStock = product.getQuantityInStock();
             Integer updatedQuantityInStock = quantityInStock - order.getQuantity();
             if (updatedQuantityInStock<0){
-                log.warn("The order can't be done, the are "+ Math.abs(updatedQuantityInStock) +" items for product with id "+ productId+" missing");
+                log.warn("Product "+productId+" not added in the order "+orderRequest.getOrderId() + " There are "+Math.abs(updatedQuantityInStock) +" items  missing");
                 prod.setMissedQuantity(Math.abs(updatedQuantityInStock));
-                orderStatus.setStatus(OrderConstants.Status.CREATED_PARTIALLY.name());
                 missingProducts.add(prod);
             }else {
+                availabeProducts.add(prod);
                 product.setQuantityInStock(updatedQuantityInStock);
                 orderRepository.save(order);
                 productRepository.save(product);
-                orderStatusRepository.save(orderStatus);
             }
         }
-        if (missingProducts.size()>0){
-            orderDTO.setOrderId(orderRequest.getOrderId());
-            orderDTO.setProducts(missingProducts);
-            orderDTO.setStatus(OrderConstants.Status.CREATED_PARTIALLY.name());
-        }else{
-            orderDTO.setOrderId(orderRequest.getOrderId());
-            orderDTO.setProducts(productsInOrder);
-            orderDTO.setStatus(OrderConstants.Status.CREATED.name());
-        }
-        log.info("order saved");
+
+        String status=missingProducts.size()==0?OrderConstants.Status.CREATED.name():missingProducts.size()==productsInOrder.size()?OrderConstants.Status.NOT_CREATED.name():OrderConstants.Status.CREATED_PARTIALLY.name();
+        OrderStatus orderStatus=OrderStatus.builder().
+                                         status(status).
+                                         orderId(orderRequest.getOrderId()).
+                                         lastUpdate(LocalDateTime.now()).build();
+        orderStatusRepository.save(orderStatus);
+
+        OrderDTO orderDTO=OrderDTO.builder()
+                .missingProducts(missingProducts)
+                .orderId(orderRequest.getOrderId())
+                .products(availabeProducts)
+                .status(status)
+                .build();
+
         return orderDTO;
 
     }
+
+
 
     @Transactional(rollbackFor = SQLException.class)
     public OrderStatus payOrder(Integer id) {

@@ -22,7 +22,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
@@ -42,7 +42,8 @@ class ProductsAndOrdersMaintenanceApplicationTests {
 
 	List<ProductRequest> productRequests;
 	OrderRequest orderRequest;
-	OrderRequest orderRequestWrong;
+	OrderRequest orderRequestPartiallyWrong;
+    OrderRequest orderRequestCompleltlyWrong;
 
 
 	@BeforeAll
@@ -65,7 +66,12 @@ class ProductsAndOrdersMaintenanceApplicationTests {
 		productsInOrder= Arrays.asList(new ProductDTO[]{ProductDTO.builder().productId(1).quantity(200).build(),
 				ProductDTO.builder().productId(2).quantity(3000).build(),
 				ProductDTO.builder().productId(3).quantity(400).build()});
-		orderRequestWrong= OrderRequest.builder().orderId(1).products(productsInOrder).build();
+        orderRequestPartiallyWrong= OrderRequest.builder().orderId(1).products(productsInOrder).build();
+
+        productsInOrder= Arrays.asList(new ProductDTO[]{ProductDTO.builder().productId(1).quantity(20000).build(),
+                ProductDTO.builder().productId(2).quantity(30000).build(),
+                ProductDTO.builder().productId(3).quantity(40000).build()});
+        orderRequestCompleltlyWrong= OrderRequest.builder().orderId(1).products(productsInOrder).build();
 	}
 
 	@Test
@@ -122,6 +128,7 @@ class ProductsAndOrdersMaintenanceApplicationTests {
 		String uriOrder = "http://localhost:" + port + "/maintenance/addOrder";
 		OrderDTO resultOrder = restTemplate.postForObject(uriOrder,orderRequest, OrderDTO.class);
 		assertEquals(resultOrder.getStatus(), OrderConstants.Status.CREATED.name());
+        assertEquals(resultOrder.getMissingProducts().size(), 0);
 
 	}
 
@@ -134,13 +141,30 @@ class ProductsAndOrdersMaintenanceApplicationTests {
 		});
 
 		String uriOrder = "http://localhost:" + port + "/maintenance/addOrder";
-		OrderDTO resultOrder = restTemplate.postForObject(uriOrder,orderRequestWrong, OrderDTO.class);
+		OrderDTO resultOrder = restTemplate.postForObject(uriOrder,orderRequestPartiallyWrong, OrderDTO.class);
 		assertEquals(resultOrder.getStatus(), OrderConstants.Status.CREATED_PARTIALLY.name());
+        assertEquals(resultOrder.getMissingProducts().size(), 1);
 
 	}
 
+    @Test
+    void addOrderWithAllMissedProductsTest() {
 
-	@Test
+        String uriPorduct = "http://localhost:" + port + "/maintenance/addProduct";
+        productRequests.stream().forEach(request-> {
+            restTemplate.postForObject(uriPorduct, request, Product.class);
+        });
+
+        String uriOrder = "http://localhost:" + port + "/maintenance/addOrder";
+        OrderDTO resultOrder = restTemplate.postForObject(uriOrder,orderRequestCompleltlyWrong, OrderDTO.class);
+        assertEquals(resultOrder.getStatus(), OrderConstants.Status.NOT_CREATED.name());
+        assertEquals(resultOrder.getMissingProducts().size(), productRequests.size());
+
+    }
+
+
+
+    @Test
 	void payOrderTest() {
 		addOrderWithoutMissedProductsTest();
 		String uriOrder = "http://localhost:" + port + "/maintenance/payOrder/"+orderRequest.getOrderId();
