@@ -4,18 +4,23 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+
 import javax.persistence.*;
+import java.time.LocalDateTime;
+import java.util.Date;
+
 
 @Entity
-@Table(name= "ORDERS")
+@Table(name= "ORDER_STATUS")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Order {
+public class OrderStatus {
 
     @Id
-    private OrderId id;
-    private int quantity;
+    private Integer orderId;
+    private String status;
+    private LocalDateTime lastUpdate;
 
 
 }

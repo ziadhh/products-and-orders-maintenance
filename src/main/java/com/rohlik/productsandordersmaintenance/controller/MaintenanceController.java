@@ -1,10 +1,12 @@
 package com.rohlik.productsandordersmaintenance.controller;
 
+import com.rohlik.productsandordersmaintenance.dto.OrderDTO;
 import com.rohlik.productsandordersmaintenance.dto.OrderRequest;
 import com.rohlik.productsandordersmaintenance.dto.ProductDTO;
 import com.rohlik.productsandordersmaintenance.dto.ProductRequest;
 import com.rohlik.productsandordersmaintenance.entity.Order;
 import com.rohlik.productsandordersmaintenance.entity.OrderId;
+import com.rohlik.productsandordersmaintenance.entity.OrderStatus;
 import com.rohlik.productsandordersmaintenance.entity.Product;
 import com.rohlik.productsandordersmaintenance.mapper.OrderMapper;
 import com.rohlik.productsandordersmaintenance.mapper.ProductMapper;
@@ -68,24 +70,35 @@ public class MaintenanceController {
 
 
     @PostMapping("/addOrder")
-    @Transactional
-    public /*ResponseEntity<Order>*/ void addOrder(@RequestBody OrderRequest orderRequest) throws Exception{
+    public ResponseEntity<OrderDTO> addOrder(@RequestBody OrderRequest orderRequest){
 
         List<Order> orders=new ArrayList<>();
         List<ProductDTO> productsInOrder=orderRequest.getProducts();
-        /*for(ProductDTO prod:productsInOrder) {
-            Order order=new Order();
-            OrderId orderId=new OrderId(orderRequest.getOrderId(),prod.getProductId());
-            order.setId(orderId);
-            order.setQuantity(prod.getQuantity());
-            orders.add(order);
-            orderService.saveOrder(order);
-        }*/
         log.info("Adding new order..");
-        orderService.saveOrder(orderRequest);
+        return    new ResponseEntity(orderService.saveOrder(orderRequest),  HttpStatus.OK);
 
 
-        //return    new ResponseEntity(orderService.saveOrder(orders),  HttpStatus.OK);
+    }
+
+
+    @PostMapping("/payOrder/{id}")
+    public ResponseEntity<OrderStatus> payOrder(@PathVariable("id") Integer id){
+
+        log.info("Paying  order..");
+
+        return    new ResponseEntity(orderService.payOrder(id),  HttpStatus.OK);
+
+
+    }
+
+    @PostMapping("/cancelOrder/{id}")
+    public ResponseEntity<OrderStatus> cancelOrder(@PathVariable("id") Integer id){
+
+        log.info("Paying  order..");
+
+        return    new ResponseEntity(orderService.cancelOrder(id),  HttpStatus.OK);
+
+
     }
 
 

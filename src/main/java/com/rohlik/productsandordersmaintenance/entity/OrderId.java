@@ -4,8 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Column;
-import javax.persistence.Embeddable;
+import javax.persistence.*;
 import java.io.Serializable;
 
 @Embeddable
@@ -19,6 +18,8 @@ public class OrderId implements Serializable {
 
     @Column(name="productId")
     private Integer productId;
+
+
 
     /*public OrderId(){
 

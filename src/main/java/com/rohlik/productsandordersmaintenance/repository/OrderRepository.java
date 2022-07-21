@@ -14,4 +14,7 @@ public interface OrderRepository extends JpaRepository<Order,Integer> {
 
     //List<Order> saveAll(List<Order> order);
 
+    @Query("select ord from Order ord where ord.id.orderId=:id")
+    List<Order> findByOrderId(@Param("id") Integer id);
+
 }
