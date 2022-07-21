@@ -16,3 +16,6 @@ spring:
     properties:
       hibernate:
         format_sql: true
+
+expiry:
+  unpaid.order.check: "0 */3 * * * *"

@@ -42,6 +42,12 @@ public class MaintenanceController {
     @Autowired
     OrderMapper orderMapper;
 
+    @GetMapping("/getProducts")
+    public ResponseEntity<List<Product>> getProducts(){
+
+        log.info("Getting all products..");
+        return    new ResponseEntity(productService.getProducts(),  HttpStatus.OK);
+    }
 
     @PostMapping("/addProduct")
     public ResponseEntity<Product> addProduct(@RequestBody ProductRequest productRequest){
@@ -68,37 +74,24 @@ public class MaintenanceController {
     }
 
 
-
     @PostMapping("/addOrder")
     public ResponseEntity<OrderDTO> addOrder(@RequestBody OrderRequest orderRequest){
-
         List<Order> orders=new ArrayList<>();
         List<ProductDTO> productsInOrder=orderRequest.getProducts();
         log.info("Adding new order..");
         return    new ResponseEntity(orderService.saveOrder(orderRequest),  HttpStatus.OK);
-
-
     }
-
 
     @PostMapping("/payOrder/{id}")
     public ResponseEntity<OrderStatus> payOrder(@PathVariable("id") Integer id){
-
         log.info("Paying  order..");
-
         return    new ResponseEntity(orderService.payOrder(id),  HttpStatus.OK);
-
-
     }
 
     @PostMapping("/cancelOrder/{id}")
     public ResponseEntity<OrderStatus> cancelOrder(@PathVariable("id") Integer id){
-
-        log.info("Paying  order..");
-
-        return    new ResponseEntity(orderService.cancelOrder(id),  HttpStatus.OK);
-
-
+        log.info("cancelling order..");
+        return    new ResponseEntity(orderService.cancelOrder(id,true),  HttpStatus.OK);
     }
 
 

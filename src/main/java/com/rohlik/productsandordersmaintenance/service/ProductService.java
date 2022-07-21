@@ -8,12 +8,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @Slf4j
 public class ProductService {
 
     @Autowired
     private ProductRepository productRepository;
+
+    public List<Product> getProducts() {
+        return productRepository.findAll();
+    }
 
     public Product saveProduct(Product product) {
         log.debug("Product will be saved");
