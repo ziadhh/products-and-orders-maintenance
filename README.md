@@ -54,9 +54,6 @@ The data model would be as follows
 | 3  | CANCELLED  | 21-09-2022 11:03
 | 4  | INVALID  | 20-09-2022 10:33
 
-Asumption:
-
-The invalid state is done after 30 min after the created status if no action have been done before.
 
 ##Links
 ###swagger
