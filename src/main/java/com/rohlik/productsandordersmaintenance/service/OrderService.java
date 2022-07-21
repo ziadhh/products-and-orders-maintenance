@@ -21,12 +21,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
+import java.sql.Array;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -122,10 +120,11 @@ public class OrderService {
     }
 
 
-    @Scheduled(cron = "${expiry.unpaid.order.check:0 */2 * * * *}")
+    @Scheduled(cron = "${expiry.unpaid.order.check:0 */30 * * * *}")
     public void cancelUnpaidOrderes() {
         log.warn("Checking unpaid orderders... ");
-        List<OrderStatus> orderStatus=orderStatusRepository.findUnpaidOrders(OrderConstants.Status.CREATED.name());
+        List<String> statusCreated= Arrays.asList(OrderConstants.Status.CREATED_PARTIALLY.name(),OrderConstants.Status.CREATED.name());
+        List<OrderStatus> orderStatus=orderStatusRepository.findCreatedOrders(statusCreated);
         orderStatus.stream().forEach(ord->{
             log.info("The order "+ord.getOrderId()+" has been cancelled");
             cancelOrder(ord.getOrderId(),false);

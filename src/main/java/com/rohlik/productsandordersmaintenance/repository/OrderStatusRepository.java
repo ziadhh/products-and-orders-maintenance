@@ -14,6 +14,6 @@ public interface OrderStatusRepository extends JpaRepository<OrderStatus,Integer
     @Query("select ord from OrderStatus ord where ord.id=:id")
     OrderStatus findByOrderId(@Param("id") Integer id);
 
-    @Query("select ord from OrderStatus ord where ord.status=:status and datediff(minute,last_update,current_timestamp)>1")
-    List<OrderStatus> findUnpaidOrders(@Param("status") String status);
+    @Query("select ord from OrderStatus ord where ord.status in (:status) and datediff(minute,last_update,current_timestamp)>30")
+    List<OrderStatus> findCreatedOrders(@Param("status") List<String> status);
 }
