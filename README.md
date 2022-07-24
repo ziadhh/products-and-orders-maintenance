@@ -42,8 +42,8 @@ The data model would be as follows
 
 #### order status assumptions
 - CREATED : all products have been added to the order
-- CREATED_PARTIALLY : only products with availablke quantity has been added: 
-- NOT_CREATED : no products have been added (any product has an available quantity)
+- CREATED_PARTIALLY : only products with available quantity has been added: 
+- NOT_CREATED : no products have been added (none product in the order has an available quantity)
 - PAID : If The order is paid it cannot change to another state ( no refunds or similar )
 - CANCELLED : The order has been cancelled manually
 - INVALID : The order has been cancelled automaticaly after 30 min
