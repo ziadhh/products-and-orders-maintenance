@@ -8,9 +8,7 @@ import com.rohlik.productsandordersmaintenance.dto.ProductDTO;
 import com.rohlik.productsandordersmaintenance.dto.ProductRequest;
 import com.rohlik.productsandordersmaintenance.entity.OrderStatus;
 import com.rohlik.productsandordersmaintenance.entity.Product;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.*;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -27,6 +25,7 @@ import static org.junit.Assert.assertEquals;
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class ProductsAndOrdersMaintenanceApplicationTests {
 
 	private String uri;
@@ -75,6 +74,7 @@ class ProductsAndOrdersMaintenanceApplicationTests {
 	}
 
 	@Test
+	@Order(1)
 	void addProductTest() {
 		uri = "http://localhost:" + port + "/maintenance/addProduct";
 		Product result = restTemplate.postForObject(uri,productRequest, Product.class);
@@ -82,6 +82,7 @@ class ProductsAndOrdersMaintenanceApplicationTests {
 	}
 
 	@Test
+	@Order(2)
 	void deleteExistingProductTest() {
 		addProductTest();
 		String uriDel = "http://localhost:" + port + "/maintenance/deleteProduct";
@@ -90,6 +91,7 @@ class ProductsAndOrdersMaintenanceApplicationTests {
 	}
 
 	@Test
+	@Order(3)
 	void deleteNonExistingProductTest() {
 		addProductTest();
 		String uriDel = "http://localhost:" + port + "/maintenance/deleteProduct";
@@ -99,6 +101,7 @@ class ProductsAndOrdersMaintenanceApplicationTests {
 	}
 
 	@Test
+	@Order(4)
 	void updateExistingProductTest() {
 		addProductTest();
 		uri = "http://localhost:" + port + "/maintenance/updateProduct";
@@ -108,6 +111,7 @@ class ProductsAndOrdersMaintenanceApplicationTests {
 	}
 
 	@Test
+	@Order(5)
 	void updateNonExistingProductTest() {
 		addProductTest();
 		uri = "http://localhost:" + port + "/maintenance/updateProduct";
@@ -118,6 +122,7 @@ class ProductsAndOrdersMaintenanceApplicationTests {
 
 
 	@Test
+	@Order(6)
 	void addOrderWithoutMissedProductsTest() {
 
 		String uriPorduct = "http://localhost:" + port + "/maintenance/addProduct";
@@ -133,6 +138,7 @@ class ProductsAndOrdersMaintenanceApplicationTests {
 	}
 
 	@Test
+	@Order(7)
 	void addOrderWithMissedProductsTest() {
 
 		String uriPorduct = "http://localhost:" + port + "/maintenance/addProduct";
@@ -148,6 +154,7 @@ class ProductsAndOrdersMaintenanceApplicationTests {
 	}
 
     @Test
+	@Order(8)
     void addOrderWithAllMissedProductsTest() {
 
         String uriPorduct = "http://localhost:" + port + "/maintenance/addProduct";
@@ -165,6 +172,7 @@ class ProductsAndOrdersMaintenanceApplicationTests {
 
 
     @Test
+	@Order(9)
 	void payOrderTest() {
 		addOrderWithoutMissedProductsTest();
 		String uriOrder = "http://localhost:" + port + "/maintenance/payOrder/"+orderRequest.getOrderId();
@@ -173,11 +181,21 @@ class ProductsAndOrdersMaintenanceApplicationTests {
 	}
 
 	@Test
+	@Order(10)
 	void cancelOrderTest() {
 		addOrderWithoutMissedProductsTest();
 		String uriOrder = "http://localhost:" + port + "/maintenance/cancelOrder/"+orderRequest.getOrderId();
 		OrderStatus resultOrder = restTemplate.postForObject(uriOrder,orderRequest, OrderStatus.class);
 		assertEquals(resultOrder.getStatus(), OrderConstants.Status.CANCELLED.name());
+	}
+
+	@Test
+	@Order(11)
+	void deleteProductWithAsociatedOrderest() {
+		addProductTest();
+		String uriDel = "http://localhost:" + port + "/maintenance/deleteProduct";
+		String result = restTemplate.postForObject(uriDel,productRequest, String.class);
+		assertEquals(ProductConstants.msgProductNotDeleted,result);
 	}
 
 

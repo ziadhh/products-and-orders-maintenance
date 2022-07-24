@@ -29,6 +29,44 @@ The data model would be as follows
 - orders table
 - status_order table
 
+#### DATABASE ASSUMPTION
+- order-product 1-N
+- order-orderStatus 1-1
+
+- A product will be delete only if it has not any order related with (independently of the status order)
+- The orderId will never be repetead ( I assume that adding an order will creates a new order)
+- When the number of items of a product is updated , I only replace old value by new one  (it is not a product items addition)
+- if an order is paid it cannot change to another status
+- As it is a test I assume that few orders will be created ( so no need to create indexes, partioning tables etc)
+- I assumed only h2 database is available , no need to create profiles (either in spring or in maven)
+
+#### order status assumptions
+- CREATED : all products have been added to the order
+- CREATED_PARTIALLY : only products with availablke quantity has been added: 
+- NOT_CREATED : no products have been added (any product has an available quantity)
+- PAID : If The order is paid it cannot change to another state ( no refunds or similar )
+- CANCELLED : The order has been cancelled manually
+- INVALID : The order has been cancelled automaticaly after 30 min
+
+
+#### Sfw design HAPPY PATH
+I tried to simplify the design as a kind of POC to show that all endpoints works, and the application does what is expected 
+- As the code is simple, I used only one REST controller that contains order requests and product request ( otherwise I coudld have created two rest controller)
+- In order to simplify the code I, used also one un service ( I could have created 2 microservices one for the orders and one for the products, but this would implied create 2 databases)
+- No tolerance failures related with microservices has been design as I only created one 
+
+#### Sfw design REAL WORLD
+- know the number of request (threshold)
+- know the number database capacity 
+- monitoring
+- more logs
+- profiles by environments
+- fault tolerance
+- perfomance test and e2e test 
+
+
+
+####Example 
 #### Products
 | PRODUCT_ID | NAME | QUANTITY_IN_STOCK | PRICE_PER_UNIT | 
 | ------------- | ------------- | ------------- | ------------- | 
@@ -53,6 +91,7 @@ The data model would be as follows
 | 2  | PAID  | 20-09-2022 12:03
 | 3  | CANCELLED  | 21-09-2022 11:03
 | 4  | INVALID  | 20-09-2022 10:33
+
 
 
 ##Links
